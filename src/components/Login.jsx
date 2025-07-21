@@ -1,19 +1,53 @@
 import Header from "./Header";
 import AuthForm from "./AuthForm";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../utils/firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 export default function Login() {
   const [mode, setmode] = useState("login");
+  const navigate = useNavigate();
   function onToggleMode() {
     setmode((prev) => {
       if (prev === "login") return "signup";
       else return "login";
     });
   }
-  function onSubmit() {
+  function onSubmit(data) {
+    console.log(data);
+    const email = data.email;
+    const password = data.password;
+
     if (mode === "login") {
       console.log("login form submitted");
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          navigate("/browse");
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+        });
     } else {
       console.log("sign up form submitted");
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          navigate("/browse");
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // ..
+        });
     }
   }
   return (
