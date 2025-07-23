@@ -2,8 +2,13 @@ import { useState, useRef, useEffect } from "react";
 import { getAuth, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { auth } from "../utils/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { addUser, removeUser } from "../utils/userSlice";
+import { useDispatch } from "react-redux";
 export default function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dispatch = useDispatch();
   const user = useSelector((store) => store.user);
   const dropdownRef = useRef();
   const navigate = useNavigate();
@@ -20,14 +25,31 @@ export default function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const { uid, email, displayName } = user;
+        dispatch(
+          addUser({
+            uid: uid,
+            email: email,
+            displayName: displayName,
+          })
+        );
+        navigate("/browse");
+      } else {
+        dispatch(removeUser());
+        navigate("/");
+      }
+    });
 
+    return () => unsubscribe();
+  }, []);
   const handleSignOut = () => {
     console.log("Sign out clicked");
     const auth = getAuth();
     signOut(auth)
-      .then(() => {
-        navigate("/");
-      })
+      .then(() => {})
       .catch((error) => {
         console.log(error);
       });

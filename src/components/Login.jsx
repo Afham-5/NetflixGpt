@@ -6,10 +6,14 @@ import { auth } from "../utils/firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 export default function Login() {
   const [mode, setmode] = useState("login");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   function onToggleMode() {
     setmode((prev) => {
       if (prev === "login") return "signup";
@@ -20,32 +24,45 @@ export default function Login() {
     console.log(data);
     const email = data.email;
     const password = data.password;
-
+    const name = data.name;
     if (mode === "login") {
-      console.log("login form submitted");
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed in
           const user = userCredential.user;
-          navigate("/browse");
-          // ...
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
+          console.log(errorMessage);
         });
     } else {
-      console.log("sign up form submitted");
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
+          console.log(email + " " + password);
           // Signed up
           const user = userCredential.user;
-          navigate("/browse");
+
+          updateProfile(user, {
+            displayName: name,
+          })
+            .then(() => user.reload())
+            .then(() => {
+              const { uid, email, displayName } = auth.currentUser;
+              dispatch(addUser({ uid, email, displayName }));
+            })
+            .catch((error) => {
+              // An error occurred
+              // ...
+              console.log(error);
+            });
+
           // ...
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
+          console.log(errorMessage);
+
           // ..
         });
     }
