@@ -1,18 +1,25 @@
 import { useForm } from "react-hook-form";
-export default function AuthForm({ mode = "login", onSubmit, onToggleMode }) {
+
+export default function AuthForm({
+  mode = "login",
+  onSubmit,
+  onToggleMode,
+  firebaseError = {},
+}) {
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
   } = useForm();
-  const isLogin = mode === "login";
 
+  const isLogin = mode === "login";
   const password = watch("password");
 
   const onFormSubmit = (data) => {
     onSubmit(data);
   };
+
   return (
     <form
       noValidate
@@ -24,6 +31,7 @@ export default function AuthForm({ mode = "login", onSubmit, onToggleMode }) {
           {isLogin ? "Sign In" : "Sign Up"}
         </h1>
       </div>
+
       <div className="flex flex-col gap-6 mb-8">
         {!isLogin && (
           <div>
@@ -42,6 +50,7 @@ export default function AuthForm({ mode = "login", onSubmit, onToggleMode }) {
             )}
           </div>
         )}
+
         <div>
           <input
             {...register("email", {
@@ -54,13 +63,19 @@ export default function AuthForm({ mode = "login", onSubmit, onToggleMode }) {
             type="email"
             placeholder="Enter Email address"
             className={`w-full bg-neutral-800 bg-opacity-60 text-white placeholder-white caret-white px-4 py-3 rounded border ${
-              errors.email ? "border-red-500" : "border-gray-500"
+              errors.email || firebaseError.email
+                ? "border-red-500"
+                : "border-gray-500"
             } focus:border-red-700 focus:outline-none`}
           />
           {errors.email && (
             <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
           )}
+          {!errors.email && firebaseError.email && (
+            <p className="text-red-500 text-sm mt-1">{firebaseError.email}</p>
+          )}
         </div>
+
         <div>
           <input
             {...register("password", {
@@ -73,7 +88,9 @@ export default function AuthForm({ mode = "login", onSubmit, onToggleMode }) {
             type="password"
             placeholder="Enter Password"
             className={`w-full bg-neutral-800 bg-opacity-70 text-white placeholder-white caret-white px-4 py-3 rounded border ${
-              errors.password ? "border-red-500" : "border-gray-500"
+              errors.password || firebaseError.password
+                ? "border-red-500"
+                : "border-gray-500"
             } focus:outline-none focus:border-white`}
           />
           {errors.password && (
@@ -81,7 +98,13 @@ export default function AuthForm({ mode = "login", onSubmit, onToggleMode }) {
               {errors.password.message}
             </p>
           )}
+          {!errors.password && firebaseError.password && (
+            <p className="text-red-500 text-sm mt-1">
+              {firebaseError.password}
+            </p>
+          )}
         </div>
+
         {!isLogin && (
           <div>
             <input
@@ -104,7 +127,14 @@ export default function AuthForm({ mode = "login", onSubmit, onToggleMode }) {
           </div>
         )}
       </div>
-      <div className="flex flex-col gap-4 ">
+
+      {firebaseError.general && (
+        <p className="text-red-500 text-sm text-center mb-4">
+          {firebaseError.general}
+        </p>
+      )}
+
+      <div className="flex flex-col gap-4">
         <button
           type="submit"
           className="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-3 rounded focus:outline-none"

@@ -10,36 +10,52 @@ import {
 } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+
 export default function Login() {
   const [mode, setmode] = useState("login");
+  const [firebaseError, setFirebaseError] = useState({});
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   function onToggleMode() {
-    setmode((prev) => {
-      if (prev === "login") return "signup";
-      else return "login";
-    });
+    setmode((prev) => (prev === "login" ? "signup" : "login"));
   }
+
   function onSubmit(data) {
-    console.log(data);
-    const email = data.email;
-    const password = data.password;
-    const name = data.name;
+    const { email, password, name } = data;
+    setFirebaseError({});
+
     if (mode === "login") {
       signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-        })
+        .then(() => {})
         .catch((error) => {
           const errorCode = error.code;
-          const errorMessage = error.message;
-          console.log(errorMessage);
+
+          switch (errorCode) {
+            case "auth/user-not-found":
+              setFirebaseError({ email: "No user found with this email." });
+              break;
+            case "auth/wrong-password":
+              setFirebaseError({ password: "Incorrect password." });
+              break;
+            case "auth/invalid-email":
+              setFirebaseError({ email: "Invalid email format." });
+              break;
+            case "auth/too-many-requests":
+              setFirebaseError({
+                general: "Too many login attempts. Try again later.",
+              });
+              break;
+            case "auth/invalid-credential":
+              setFirebaseError({ general: "Invalid email or password." });
+              break;
+            default:
+              setFirebaseError({ general: "Login failed. Please try again." });
+          }
         });
     } else {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          console.log(email + " " + password);
-          // Signed up
           const user = userCredential.user;
 
           updateProfile(user, {
@@ -49,24 +65,30 @@ export default function Login() {
             .then(() => {
               const { uid, email, displayName } = auth.currentUser;
               dispatch(addUser({ uid, email, displayName }));
-            })
-            .catch((error) => {
-              // An error occurred
-              // ...
-              console.log(error);
             });
-
-          // ...
         })
         .catch((error) => {
           const errorCode = error.code;
-          const errorMessage = error.message;
-          console.log(errorMessage);
 
-          // ..
+          switch (errorCode) {
+            case "auth/email-already-in-use":
+              setFirebaseError({ email: "Email is already registered." });
+              break;
+            case "auth/weak-password":
+              setFirebaseError({
+                password: "Password should be at least 6 characters.",
+              });
+              break;
+            case "auth/invalid-email":
+              setFirebaseError({ email: "Invalid email format." });
+              break;
+            default:
+              setFirebaseError({ general: "Signup failed. Please try again." });
+          }
         });
     }
   }
+
   return (
     <>
       <Header />
@@ -78,7 +100,12 @@ export default function Login() {
         />
       </div>
       <div className="absolute w-full h-screen flex justify-center items-center z-50">
-        <AuthForm mode={mode} onSubmit={onSubmit} onToggleMode={onToggleMode} />
+        <AuthForm
+          mode={mode}
+          onSubmit={onSubmit}
+          onToggleMode={onToggleMode}
+          firebaseError={firebaseError}
+        />
       </div>
     </>
   );
