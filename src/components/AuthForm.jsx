@@ -23,16 +23,16 @@ export default function AuthForm({
   return (
     <form
       noValidate
-      className="bg-black/80 w-[30%] rounded-xl px-10 py-10 flex flex-col"
+      className="bg-black/80 w-[90%] sm:w-[80%] md:w-[60%] lg:w-[30%] rounded-xl px-6 sm:px-8 md:px-10 py-8 sm:py-10 flex flex-col max-w-md sm:max-w-lg md:max-w-xl lg:max-w-none"
       onSubmit={handleSubmit(onFormSubmit)}
     >
-      <div className="mb-8">
-        <h1 className="text-white text-[32px] font-bold">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-white text-2xl sm:text-3xl md:text-[32px] font-bold">
           {isLogin ? "Sign In" : "Sign Up"}
         </h1>
       </div>
 
-      <div className="flex flex-col gap-6 mb-8">
+      <div className="flex flex-col gap-4 sm:gap-6 mb-6 sm:mb-8">
         {!isLogin && (
           <div>
             <input
@@ -41,12 +41,14 @@ export default function AuthForm({
               })}
               type="text"
               placeholder="Enter Full Name"
-              className={`w-full bg-neutral-800 bg-opacity-60 text-white placeholder-white caret-white px-4 py-3 rounded border ${
+              className={`w-full bg-neutral-800 bg-opacity-60 text-white placeholder-white caret-white px-3 sm:px-4 py-2.5 sm:py-3 rounded border text-sm sm:text-base ${
                 errors.name ? "border-red-500" : "border-gray-500"
               } focus:border-red-700 focus:outline-none`}
             />
             {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+              <p className="text-red-500 text-xs sm:text-sm mt-1">
+                {errors.name.message}
+              </p>
             )}
           </div>
         )}
@@ -62,17 +64,21 @@ export default function AuthForm({
             })}
             type="email"
             placeholder="Enter Email address"
-            className={`w-full bg-neutral-800 bg-opacity-60 text-white placeholder-white caret-white px-4 py-3 rounded border ${
+            className={`w-full bg-neutral-800 bg-opacity-60 text-white placeholder-white caret-white px-3 sm:px-4 py-2.5 sm:py-3 rounded border text-sm sm:text-base ${
               errors.email || firebaseError.email
                 ? "border-red-500"
                 : "border-gray-500"
             } focus:border-red-700 focus:outline-none`}
           />
           {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+            <p className="text-red-500 text-xs sm:text-sm mt-1">
+              {errors.email.message}
+            </p>
           )}
           {!errors.email && firebaseError.email && (
-            <p className="text-red-500 text-sm mt-1">{firebaseError.email}</p>
+            <p className="text-red-500 text-xs sm:text-sm mt-1">
+              {firebaseError.email}
+            </p>
           )}
         </div>
 
@@ -87,19 +93,19 @@ export default function AuthForm({
             })}
             type="password"
             placeholder="Enter Password"
-            className={`w-full bg-neutral-800 bg-opacity-70 text-white placeholder-white caret-white px-4 py-3 rounded border ${
+            className={`w-full bg-neutral-800 bg-opacity-70 text-white placeholder-white caret-white px-3 sm:px-4 py-2.5 sm:py-3 rounded border text-sm sm:text-base ${
               errors.password || firebaseError.password
                 ? "border-red-500"
                 : "border-gray-500"
             } focus:outline-none focus:border-white`}
           />
           {errors.password && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-red-500 text-xs sm:text-sm mt-1">
               {errors.password.message}
             </p>
           )}
           {!errors.password && firebaseError.password && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-red-500 text-xs sm:text-sm mt-1">
               {firebaseError.password}
             </p>
           )}
@@ -115,12 +121,12 @@ export default function AuthForm({
               })}
               type="password"
               placeholder="Confirm Password"
-              className={`w-full bg-neutral-800 bg-opacity-70 text-white placeholder-white caret-white px-4 py-3 rounded border ${
+              className={`w-full bg-neutral-800 bg-opacity-70 text-white placeholder-white caret-white px-3 sm:px-4 py-2.5 sm:py-3 rounded border text-sm sm:text-base ${
                 errors.confirmPassword ? "border-red-500" : "border-gray-500"
               } focus:outline-none focus:border-white`}
             />
             {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-red-500 text-xs sm:text-sm mt-1">
                 {errors.confirmPassword.message}
               </p>
             )}
@@ -129,20 +135,20 @@ export default function AuthForm({
       </div>
 
       {firebaseError.general && (
-        <p className="text-red-500 text-sm text-center mb-4">
+        <p className="text-red-500 text-xs sm:text-sm text-center mb-3 sm:mb-4">
           {firebaseError.general}
         </p>
       )}
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         <button
           type="submit"
-          className="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-3 rounded focus:outline-none"
+          className="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-2.5 sm:py-3 rounded focus:outline-none text-sm sm:text-base"
         >
           {isLogin ? "Sign In" : "Sign Up"}
         </button>
 
-        <p className="text-white text-sm text-center">
+        <p className="text-white text-xs sm:text-sm text-center">
           {isLogin ? "New to NetflixGpt?" : "Already have an account?"}{" "}
           <span
             className="underline cursor-pointer hover:text-red-500"
